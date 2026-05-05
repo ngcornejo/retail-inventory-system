@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.py[cod]
+venv/
+*.egg-info/
+
+# Base de datos
+data/inventory.db
+
+# VSCode
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db

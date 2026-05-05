@@ -80,7 +80,7 @@ retail-inventory-system/
 
 ```bash
 # 1. Clonar el repositorio
-git clone https://github.com/TU_USUARIO/retail-inventory-system.git
+git clone https://github.com/ngcornejo/retail-inventory-system.git
 cd retail-inventory-system
 
 # 2. Crear entorno virtual
