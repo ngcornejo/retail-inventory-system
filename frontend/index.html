@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Retail Inventory System</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f7f8f9;
+      --surface: #ffffff;
+      --border: #e8eaed;
+      --border-light: #f0f2f5;
+      --text: #1a1d23;
+      --text-muted: #6b7280;
+      --text-light: #9ca3af;
+      --green: #16a34a;
+      --green-light: #dcfce7;
+      --green-mid: #4ade80;
+      --blue: #2563eb;
+      --blue-light: #dbeafe;
+      --red: #dc2626;
+      --red-light: #fee2e2;
+      --amber: #d97706;
+      --amber-light: #fef3c7;
+      --radius: 10px;
+      --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 60px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+
+    .logo-icon {
+      width: 28px;
+      height: 28px;
+      background: linear-gradient(135deg, var(--green), var(--blue));
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 0.75rem;
+      font-family: 'DM Mono', monospace;
+      font-weight: 500;
+    }
+
+    .header-meta {
+      font-size: 0.78rem;
+      color: var(--text-light);
+      font-family: 'DM Mono', monospace;
+    }
+
+    /* ── Nav ── */
+    nav {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      display: flex;
+      gap: 0;
+    }
+
+    .nav-tab {
+      padding: 0.75rem 1.25rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .nav-tab:hover { color: var(--text); }
+
+    .nav-tab.active {
+      color: var(--green);
+      border-bottom-color: var(--green);
+    }
+
+    .nav-badge {
+      background: var(--red);
+      color: white;
+      font-size: 0.65rem;
+      font-family: 'DM Mono', monospace;
+      padding: 1px 5px;
+      border-radius: 10px;
+      font-weight: 500;
+    }
+
+    /* ── Main ── */
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .tab-content { display: none; }
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.2s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Page header ── */
+    .page-header {
+      margin-bottom: 1.5rem;
+    }
+
+    .page-title {
+      font-size: 1.4rem;
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      color: var(--text);
+      margin-bottom: 0.25rem;
+    }
+
+    .page-subtitle {
+      font-size: 0.83rem;
+      color: var(--text-muted);
+    }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .card-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .card-count {
+      font-size: 0.75rem;
+      font-family: 'DM Mono', monospace;
+      color: var(--text-light);
+      background: var(--bg);
+      padding: 2px 8px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+    }
+
+    /* ── Tables ── */
+    .table-wrap { overflow-x: auto; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.83rem;
+    }
+
+    thead tr {
+      background: var(--bg);
+    }
+
+    th {
+      padding: 0.6rem 1.25rem;
+      text-align: left;
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 0.75rem 1.25rem;
+      border-top: 1px solid var(--border-light);
+      color: var(--text);
+    }
+
+    tbody tr:hover { background: var(--bg); }
+
+    .mono {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.8rem;
+    }
+
+    /* ── Badges ── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 0.73rem;
+      font-weight: 500;
+    }
+
+    .badge-green  { background: var(--green-light);  color: var(--green); }
+    .badge-blue   { background: var(--blue-light);   color: var(--blue); }
+    .badge-red    { background: var(--red-light);    color: var(--red); }
+    .badge-amber  { background: var(--amber-light);  color: var(--amber); }
+
+    /* ── Alert cards ── */
+    .alert-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 0.75rem;
+    }
+
+    .alert-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--red);
+      border-radius: var(--radius);
+      padding: 1rem 1.1rem;
+      box-shadow: var(--shadow);
+    }
+
+    .alert-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 0.6rem;
+    }
+
+    .alert-product-name {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.3;
+    }
+
+    .alert-depot {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .alert-qty {
+      font-family: 'DM Mono', monospace;
+      font-size: 1.4rem;
+      font-weight: 500;
+      color: var(--red);
+      line-height: 1;
+    }
+
+    .alert-qty-label {
+      font-size: 0.65rem;
+      color: var(--text-light);
+      text-align: right;
+    }
+
+    .alert-bar-wrap {
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .alert-bar {
+      height: 100%;
+      background: var(--red);
+      border-radius: 2px;
+      transition: width 0.6s ease;
+    }
+
+    .alert-meta {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 0.4rem;
+      font-size: 0.7rem;
+      color: var(--text-light);
+      font-family: 'DM Mono', monospace;
+    }
+
+    /* ── Metrics ── */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .metric-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.1rem;
+      box-shadow: var(--shadow);
+    }
+
+    .metric-label {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.4rem;
+    }
+
+    .metric-value {
+      font-family: 'DM Mono', monospace;
+      font-size: 1.5rem;
+      font-weight: 500;
+      color: var(--text);
+      line-height: 1;
+    }
+
+    .metric-sub {
+      font-size: 0.72rem;
+      color: var(--text-light);
+      margin-top: 0.3rem;
+    }
+
+    /* ── Forecast chart ── */
+    .forecast-section {
+      margin-bottom: 1.5rem;
+    }
+
+    .forecast-filters {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+
+    .filter-btn {
+      padding: 0.35rem 0.85rem;
+      font-size: 0.78rem;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 500;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      background: var(--surface);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .filter-btn:hover { border-color: var(--green); color: var(--green); }
+
+    .filter-btn.active {
+      background: var(--green);
+      border-color: var(--green);
+      color: white;
+    }
+
+    .chart-container {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+    }
+
+    .chart-bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 0.5rem;
+      height: 160px;
+      margin-bottom: 0.5rem;
+    }
+
+    .chart-bar-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      height: 100%;
+      justify-content: flex-end;
+    }
+
+    .chart-bar-val {
+      font-size: 0.68rem;
+      font-family: 'DM Mono', monospace;
+      color: var(--text-muted);
+    }
+
+    .chart-bar {
+      width: 100%;
+      background: linear-gradient(180deg, var(--green-mid), var(--green));
+      border-radius: 4px 4px 0 0;
+      transition: height 0.5s cubic-bezier(.4,0,.2,1);
+      min-height: 4px;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .chart-bar:hover { filter: brightness(1.1); }
+
+    .chart-bar.highlight {
+      background: linear-gradient(180deg, #93c5fd, var(--blue));
+    }
+
+    .chart-labels {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .chart-label {
+      flex: 1;
+      text-align: center;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    /* ── Loading & empty ── */
+    .loading {
+      padding: 3rem;
+      text-align: center;
+      color: var(--text-light);
+      font-size: 0.83rem;
+    }
+
+    .loading::before {
+      content: '';
+      display: block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--border);
+      border-top-color: var(--green);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin: 0 auto 0.75rem;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .empty {
+      padding: 3rem;
+      text-align: center;
+      color: var(--text-light);
+      font-size: 0.83rem;
+    }
+
+    /* ── Grid layout ── */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    @media (max-width: 700px) {
+      .two-col { grid-template-columns: 1fr; }
+      main { padding: 1rem; }
+      .metrics-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">RI</div>
+    Retail Inventory System
+  </div>
+  <span class="header-meta" id="last-updated">—</span>
+</header>
+
+<nav>
+  <div class="nav-tab active" onclick="switchTab('products')">Productos</div>
+  <div class="nav-tab" onclick="switchTab('deposits')">Depósitos</div>
+  <div class="nav-tab" onclick="switchTab('alerts')">
+    Alertas <span class="nav-badge" id="alert-badge" style="display:none">0</span>
+  </div>
+  <div class="nav-tab" onclick="switchTab('metrics')">Métricas</div>
+  <div class="nav-tab" onclick="switchTab('forecast')">Proyecciones</div>
+</nav>
+
+<main>
+
+  <!-- Productos -->
+  <div class="tab-content active" id="tab-products">
+    <div class="page-header">
+      <div class="page-title">Productos</div>
+      <div class="page-subtitle">Catálogo completo de productos por categoría</div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Todos los productos</span>
+        <span class="card-count" id="products-count">—</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nombre</th>
+              <th>Categoría</th>
+              <th>Precio</th>
+              <th>Umbral stock</th>
+            </tr>
+          </thead>
+          <tbody id="products-body">
+            <tr><td colspan="5"><div class="loading">Cargando productos...</div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Depósitos -->
+  <div class="tab-content" id="tab-deposits">
+    <div class="page-header">
+      <div class="page-title">Depósitos</div>
+      <div class="page-subtitle">Red de depósitos activos</div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Depósitos registrados</span>
+        <span class="card-count" id="deposits-count">—</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nombre</th>
+              <th>Ubicación</th>
+            </tr>
+          </thead>
+          <tbody id="deposits-body">
+            <tr><td colspan="3"><div class="loading">Cargando depósitos...</div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Alertas -->
+  <div class="tab-content" id="tab-alerts">
+    <div class="page-header">
+      <div class="page-title">Alertas de stock</div>
+      <div class="page-subtitle">Productos por debajo del umbral mínimo configurado</div>
+    </div>
+    <div id="alerts-container">
+      <div class="loading">Cargando alertas...</div>
+    </div>
+  </div>
+
+  <!-- Métricas -->
+  <div class="tab-content" id="tab-metrics">
+    <div class="page-header">
+      <div class="page-title">Métricas de rotación</div>
+      <div class="page-subtitle">Promedio diario de ventas por producto en los últimos 60 días</div>
+    </div>
+    <div id="metrics-summary" class="metrics-grid"></div>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Detalle por producto</span>
+        <span class="card-count" id="metrics-count">—</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Producto ID</th>
+              <th>Total vendido</th>
+              <th>Días</th>
+              <th>Promedio diario</th>
+              <th>Rotación</th>
+            </tr>
+          </thead>
+          <tbody id="metrics-body">
+            <tr><td colspan="5"><div class="loading">Cargando métricas...</div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Proyecciones -->
+  <div class="tab-content" id="tab-forecast">
+    <div class="page-header">
+      <div class="page-title">Proyecciones</div>
+      <div class="page-subtitle">Demanda estimada por día de la semana según historial</div>
+    </div>
+    <div class="forecast-section">
+      <div class="forecast-filters" id="forecast-filters">
+        <div class="loading">Cargando productos...</div>
+      </div>
+      <div class="chart-container">
+        <div class="chart-bars" id="chart-bars"></div>
+        <div class="chart-labels" id="chart-labels"></div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+const API = 'http://127.0.0.1:5000';
+const DAYS = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
+
+let forecastData = [];
+let selectedProduct = null;
+let productsMap = {};
+
+// ── Tab switching ──
+function switchTab(name) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+// ── Fetch helpers ──
+async function fetchJSON(endpoint) {
+  const res = await fetch(API + endpoint);
+  return res.json();
+}
+
+function fmt(n) {
+  return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(n);
+}
+
+function now() {
+  return new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
+}
+
+// ── Products ──
+async function loadProducts() {
+  const data = await fetchJSON('/api/products');
+  productsMap = {};
+  data.forEach(p => productsMap[p.id] = p);
+
+  const CATEGORY_COLORS = {
+    'Lácteos': 'badge-blue', 'Carnes': 'badge-red', 'Bebidas': 'badge-green',
+    'Almacén': 'badge-amber', 'Panadería': 'badge-amber', 'Limpieza': 'badge-blue'
+  };
+
+  document.getElementById('products-count').textContent = data.length + ' productos';
+  document.getElementById('products-body').innerHTML = data.map(p => `
+    <tr>
+      <td class="mono">#${p.id}</td>
+      <td style="font-weight:500">${p.name}</td>
+      <td><span class="badge ${CATEGORY_COLORS[p.category] || 'badge-blue'}">${p.category}</span></td>
+      <td class="mono">${fmt(p.price)}</td>
+      <td class="mono">${p.stock_threshold} u.</td>
+    </tr>
+  `).join('');
+}
+
+// ── Deposits ──
+async function loadDeposits() {
+  const data = await fetchJSON('/api/deposits');
+  document.getElementById('deposits-count').textContent = data.length + ' depósitos';
+  document.getElementById('deposits-body').innerHTML = data.map(d => `
+    <tr>
+      <td class="mono">#${d.id}</td>
+      <td style="font-weight:500">${d.name}</td>
+      <td style="color:var(--text-muted)">${d.location}</td>
+    </tr>
+  `).join('');
+}
+
+// ── Alerts ──
+async function loadAlerts() {
+  const data = await fetchJSON('/api/analytics/stock');
+
+  const badge = document.getElementById('alert-badge');
+  if (data.length > 0) {
+    badge.textContent = data.length;
+    badge.style.display = 'inline';
+  }
+
+  if (data.length === 0) {
+    document.getElementById('alerts-container').innerHTML =
+      '<div class="empty">✓ Sin alertas activas — todo el stock está por encima del umbral.</div>';
+    return;
+  }
+
+  const grid = document.createElement('div');
+  grid.className = 'alert-grid';
+
+  data.forEach(a => {
+    const pct = Math.min((a.quantity / a.stock_threshold) * 100, 100);
+    const productName = productsMap[a.product_id]?.name || `Producto #${a.product_id}`;
+    const depositName = `Depósito #${a.warehouse_id}`;
+
+    const card = document.createElement('div');
+    card.className = 'alert-card';
+    card.innerHTML = `
+      <div class="alert-card-top">
+        <div>
+          <div class="alert-product-name">${productName}</div>
+          <div class="alert-depot">${depositName}</div>
+        </div>
+        <div>
+          <div class="alert-qty">${a.quantity}</div>
+          <div class="alert-qty-label">unidades</div>
+        </div>
+      </div>
+      <div class="alert-bar-wrap">
+        <div class="alert-bar" style="width:${pct}%"></div>
+      </div>
+      <div class="alert-meta">
+        <span>${pct.toFixed(0)}% del umbral</span>
+        <span>mín. ${a.stock_threshold} u.</span>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+
+  document.getElementById('alerts-container').innerHTML = '';
+  document.getElementById('alerts-container').appendChild(grid);
+}
+
+// ── Metrics ──
+async function loadMetrics() {
+  const data = await fetchJSON('/api/analytics/metrics');
+
+  const maxAvg = Math.max(...data.map(d => d.average));
+  const totalSold = data.reduce((s, d) => s + d.quantity, 0);
+  const avgDaily = (data.reduce((s, d) => s + d.average, 0) / data.length).toFixed(1);
+
+  document.getElementById('metrics-summary').innerHTML = `
+    <div class="metric-card">
+      <div class="metric-label">Total vendido</div>
+      <div class="metric-value">${totalSold.toLocaleString('es-AR')}</div>
+      <div class="metric-sub">últimos 60 días</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Promedio diario</div>
+      <div class="metric-value">${avgDaily}</div>
+      <div class="metric-sub">unidades / día / producto</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Producto líder</div>
+      <div class="metric-value" style="font-size:1rem;margin-top:4px">${productsMap[data.find(d=>d.average===maxAvg)?.product_id]?.name || '—'}</div>
+      <div class="metric-sub">${maxAvg} u/día promedio</div>
+    </div>
+  `;
+
+  document.getElementById('metrics-count').textContent = data.length + ' productos';
+  document.getElementById('metrics-body').innerHTML = data.map(d => {
+    const pct = (d.average / maxAvg) * 100;
+    const level = pct > 66 ? 'badge-green' : pct > 33 ? 'badge-amber' : 'badge-red';
+    const label = pct > 66 ? 'Alta' : pct > 33 ? 'Media' : 'Baja';
+    return `
+      <tr>
+        <td style="font-weight:500">${productsMap[d.product_id]?.name || '#' + d.product_id}</td>
+        <td class="mono">${d.quantity.toLocaleString('es-AR')}</td>
+        <td class="mono">${d.days}</td>
+        <td class="mono">${d.average}</td>
+        <td><span class="badge ${level}">${label}</span></td>
+      </tr>
+    `;
+  }).join('');
+}
+
+// ── Forecast ──
+async function loadForecast() {
+  forecastData = await fetchJSON('/api/analytics/forecast');
+
+  const productIds = [...new Set(forecastData.map(d => d.product_id))];
+  selectedProduct = productIds[0];
+
+  const filters = document.getElementById('forecast-filters');
+  filters.innerHTML = productIds.map(id => `
+    <button class="filter-btn ${id === selectedProduct ? 'active' : ''}"
+      onclick="selectForecastProduct(${id}, this)">
+      ${productsMap[id]?.name || 'Producto #' + id}
+    </button>
+  `).join('');
+
+  renderForecastChart();
+}
+
+function selectForecastProduct(id, btn) {
+  selectedProduct = id;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderForecastChart();
+}
+
+function renderForecastChart() {
+  const productData = forecastData.filter(d => d.product_id === selectedProduct);
+  const sorted = DAYS.map(day => productData.find(d => d.weekday === day) || { weekday: day, average: 0 });
+  const max = Math.max(...sorted.map(d => d.average));
+  const maxDay = sorted.find(d => d.average === max)?.weekday;
+
+  document.getElementById('chart-bars').innerHTML = sorted.map(d => {
+    const h = max > 0 ? Math.max((d.average / max) * 140, 4) : 4;
+    const isMax = d.weekday === maxDay;
+    return `
+      <div class="chart-bar-wrap">
+        <div class="chart-bar-val">${d.average}</div>
+        <div class="chart-bar ${isMax ? 'highlight' : ''}" style="height:${h}px"
+          title="${d.weekday}: ${d.average} u."></div>
+      </div>
+    `;
+  }).join('');
+
+  document.getElementById('chart-labels').innerHTML = sorted.map(d => `
+    <div class="chart-label">${d.weekday.slice(0,3)}</div>
+  `).join('');
+}
+
+// ── Init ──
+async function init() {
+  document.getElementById('last-updated').textContent = 'Actualizado ' + now();
+  await loadProducts();
+  await loadDeposits();
+  await loadAlerts();
+  await loadMetrics();
+  await loadForecast();
+}
+
+init();
+</script>
+</body>
+</html>
