@@ -42,6 +42,52 @@ def parse_columns(table_name: str) -> str:
         parsed_output = parsed_output[:-2] + ")"
         return parsed_output
 
+def init_db():
+    import os
+    db_path = "./data/inventory.db"
+    os.makedirs("./data", exist_ok=True)
+    
+    with sqlite3.connect(db_path) as db:
+        cur = db.cursor()
+        cur.executescript("""
+            CREATE TABLE IF NOT EXISTS products(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name varchar(255),
+                category varchar(255),
+                price decimal(6,2),
+                stock_threshold INTEGER
+            );
+            CREATE TABLE IF NOT EXISTS deposits(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name varchar(255),
+                location varchar(255)
+            );
+            CREATE TABLE IF NOT EXISTS stock(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                warehouse_id INTEGER,
+                product_id INTEGER,
+                quantity INTEGER,
+                UNIQUE(warehouse_id, product_id),
+                FOREIGN KEY (warehouse_id) REFERENCES deposits(id),
+                FOREIGN KEY (product_id) REFERENCES products(id)
+            );
+            CREATE TABLE IF NOT EXISTS sales(
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                product_id INTEGER,
+                warehouse_id INTEGER,
+                quantity INTEGER,
+                date DATETIME
+            );
+        """)
+        db.commit()
+
+        count = cur.execute("SELECT COUNT(*) FROM products").fetchone()[0]
+        if count == 0:
+            import sys
+            sys.path.insert(0, ".")
+            import seed
+            seed.main()
+
 if __name__ == '__main__':
     with sqlite3.connect("./data/inventory.db") as db:
         cur = db.cursor()

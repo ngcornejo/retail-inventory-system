@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_cors import CORS
 import analytics.metrics, analytics.stock_threshold, analytics.proyections
+import database
 
 from routes.products import products_bp
 from routes.deposits import deposits_bp
@@ -12,7 +13,7 @@ app.register_blueprint(products_bp)
 app.register_blueprint(deposits_bp)
 app.register_blueprint(stock_bp)
 app.register_blueprint(sales_bp)
-
+database.init_db()
 CORS(app)
 
 @app.route("/")
