@@ -4,30 +4,28 @@ from database import insert_into_table, expose_table, remove_value
 
 from flask import Blueprint
 
-products_bp = Blueprint("products", __name__)
+deposits_bp = Blueprint("deposits", __name__)
 
-def getProducts():
+def getDeposits():
     return [{
                      "id": item[0],
                      "name": item[1],
-                     "category": item[2],
-                     "price": item[3],
-                     "stock_threshold": item[4]
-                    } for item in expose_table("products")]
+                     "location": item[2]
+                    } for item in expose_table("deposits")]
 
-@products_bp.route("/api/products", methods = ["GET", "POST"])
+@deposits_bp.route("/api/deposits", methods = ["GET", "POST"])
 def get_products():
     if request.method == "POST":
-        insert_into_table(request.get_json(), "products")
-        return getProducts(), 201
-    return getProducts(), 200
+        insert_into_table(request.get_json(), "deposits")
+        return getDeposits(), 201
+    return getDeposits(), 200
 
 
-@products_bp.route("/api/products/<id>", methods = ["GET", "PUT", "DELETE"])
+@deposits_bp.route("/api/deposits/<id>", methods = ["GET", "PUT", "DELETE"])
 def id_products(id):
     match (request.method):
         case "GET":
-            for i in getProducts():
+            for i in getDeposits():
                 if i["id"] == int(id):
                     return i, 200
             return {"error": "Value not found"}, 404
@@ -37,11 +35,11 @@ def id_products(id):
             data = request.get_json()
             set_clause = ", ".join([f"{col} = ?" for col in data.keys()])
             values = list(data.values()) + [int(id)]
-            cursor.execute(f"UPDATE products SET {set_clause} WHERE id = ?", values)
+            cursor.execute(f"UPDATE deposits SET {set_clause} WHERE id = ?", values)
             db.commit()
-            return getProducts(), 200
+            return getDeposits(), 200
         case "DELETE":
-            remove_value(id, "products")
-            return getProducts(), 200
+            remove_value(id, "deposits")
+            return getDeposits(), 200
         case _:
             return {"error": "Method not allowed"}, 405

@@ -224,9 +224,9 @@ Estima la demanda esperada para cada día (lunes a domingo) usando el promedio h
 
 - [x] Diseño de base de datos y modelos
 - [x] Documentación inicial (este README)
-- [ ] Implementación de modelos y base de datos
-- [ ] Endpoints CRUD de productos y depósitos
-- [ ] Registro de ventas
+- [x] Implementación de modelos y base de datos
+- [x] Endpoints CRUD de productos y depósitos
+- [x] Registro de ventas
 - [ ] Módulo de analytics y proyecciones
 - [ ] Frontend — Dashboard
 - [ ] Documentación de API (`docs/api.md`)
