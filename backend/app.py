@@ -1,6 +1,5 @@
 from flask import Flask
 from flask_cors import CORS
-import database
 import analytics.metrics, analytics.stock_threshold, analytics.proyections
 
 from routes.products import products_bp
@@ -18,7 +17,7 @@ CORS(app)
 
 @app.route("/")
 def hello_world():
-    return f"""<meta charset=\"UTF-8\"> {database.expose_table('products')}"""
+    return {"status": "OK"}, 200
 
 @app.route("/api/analytics/metrics")
 def get_metrics():
